@@ -36,6 +36,8 @@ Configurar como secrets do GitHub Actions para deploy automático:
 
 O workflow `.github/workflows/deploy.yml` executa `wrangler deploy` automaticamente após push em `main`, desde que os secrets externos estejam configurados.
 
+Último disparo autenticado: 2026-08-20 14:36 BRT.
+
 ## Segurança
 
 Nunca colocar `AIRTABLE_TOKEN` em `public/`, JavaScript do navegador ou no repositório. O token deve existir apenas como secret no runtime do Worker.
