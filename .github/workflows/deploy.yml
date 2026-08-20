@@ -16,8 +16,16 @@ jobs:
         with:
           node-version: 22
       - run: npm install -g wrangler@latest
+
       - name: Deploy to Cloudflare Workers
         run: wrangler deploy
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Configure Airtable runtime secret
+        run: printf '%s' "$AIRTABLE_TOKEN" | wrangler secret put AIRTABLE_TOKEN
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
