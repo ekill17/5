@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Doutrina — Segundo Cérebro · Puxe o Fio</title>
+<style>
+:root{--bg:#f4f2ed;--paper:#fffdf9;--text:#20201e;--muted:#77736d;--line:#e8e3da;--accent:#6d5f49;--shadow:0 14px 45px rgba(36,32,24,.08)}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f7f5f1 0%,var(--bg) 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
+button{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) 310px}.main{padding:26px 34px 64px}.top{max-width:940px;margin:0 auto 24px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;letter-spacing:-.02em}.brand span{color:var(--muted);font-weight:500}.meta{font-size:14px;color:var(--muted)}
+.reader{max-width:940px;margin:0 auto}.card{background:var(--paper);border:1px solid rgba(84,71,52,.08);border-radius:28px;padding:46px 54px;box-shadow:var(--shadow);min-height:430px;display:flex;flex-direction:column;justify-content:center}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--accent);font-weight:700}.anki{margin-top:10px;font-size:13px;color:var(--muted)}h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(30px,4vw,50px);font-weight:500;line-height:1.06;letter-spacing:-.03em;margin:20px 0 22px}.content{font-family:Georgia,"Times New Roman",serif;font-size:20px;line-height:1.65;color:#37342f;white-space:pre-wrap}.thread{margin-top:28px}.thread-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}.thread-head h2{font-family:Georgia,"Times New Roman",serif;font-size:26px;margin:0}.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.option{background:rgba(255,253,249,.82);border:1px solid var(--line);border-radius:18px;padding:18px 19px;text-align:left;cursor:pointer;transition:.18s ease;min-height:112px}.option:hover{transform:translateY(-2px);border-color:#cfc6b7;box-shadow:0 10px 25px rgba(36,32,24,.06)}.kind{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700}.label{font-weight:700;margin:7px 0 4px}.dest{color:var(--muted);font-size:14px;line-height:1.4}.bridge{margin:22px 0;background:#ece7de;border-radius:20px;padding:20px 22px;display:none}.bridge strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.11em;color:var(--accent);margin-bottom:8px}.bridge p{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.55;margin:0}.side{border-left:1px solid var(--line);background:rgba(255,255,255,.44);padding:28px 22px;position:sticky;top:0;height:100vh;overflow:auto}.side h3{margin:0 0 18px;font-size:14px}.path{display:flex;flex-direction:column;gap:4px}.node{padding:11px 12px;border-radius:12px;font-size:13px;color:var(--muted)}.node.current{background:#fff;color:var(--text);box-shadow:0 4px 14px rgba(36,32,24,.06);font-weight:700}.arrow{padding-left:18px;color:#b1aa9f}.empty{color:var(--muted);font-size:14px}.error{max-width:940px;margin:20px auto;background:#fff0ef;border:1px solid #f1cac5;color:#7e332b;padding:14px 16px;border-radius:14px;display:none}.loading{opacity:.5;pointer-events:none}
+@media(max-width:880px){.app{display:block}.side{position:relative;height:auto;border-left:0;border-top:1px solid var(--line)}.main{padding:18px 16px 40px}.card{padding:30px 24px;border-radius:22px}.options{grid-template-columns:1fr}.content{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="main">
+    <div class="top"><div class="brand">Doutrina <span>— Segundo Cérebro</span></div><div class="meta" id="progress">Puxe o Fio</div></div>
+    <div class="error" id="error"></div>
+    <section class="reader" id="reader">
+      <article class="card">
+        <div class="eyebrow">Cartão atual</div>
+        <div class="anki" id="anki">carregando…</div>
+        <h1 id="title">Abrindo o fio…</h1>
+        <div class="content" id="content"></div>
+      </article>
+      <div class="bridge" id="bridge"><strong>Por que este caminho?</strong><p id="bridgeText"></p></div>
+      <section class="thread">
+        <div class="thread-head"><div>🧵</div><h2>Puxe o fio</h2></div>
+        <div class="options" id="options"><div class="empty">Buscando próximos caminhos coerentes…</div></div>
+      </section>
+    </section>
+  </main>
+  <aside class="side"><h3>Seu fio</h3><div class="path" id="path"><div class="empty">O percurso aparecerá aqui.</div></div></aside>
+</div>
+<script>
+const state={current:null,visited:[],trail:[]};
+const $=id=>document.getElementById(id);
+function clean(s=''){return String(s).replace(/\{\{c\d+::/g,'').replace(/\}\}/g,'').trim()}
+function titleFor(c){const front=clean(c.front||''); if(front&&front.length<150)return front; const body=clean(c.body||''); return body.split(/[\n.!?]/)[0].slice(0,120)||c.ankiId||'Cartão'}
+function bodyFor(c){return clean(c.body||c.front||'Conteúdo indisponível neste cartão.')}
+function setError(msg){$('error').textContent=msg;$('error').style.display='block'}
+function renderCard(c){state.current=c;$('anki').textContent=c.ankiId||'Cartão';$('title').textContent=titleFor(c);$('content').textContent=bodyFor(c);$('progress').textContent=`${state.trail.length||1} cartão${state.trail.length===1?'':'ões'} percorrido${state.trail.length===1?'':'s'}`;renderPath()}
+function renderPath(){const el=$('path');el.innerHTML='';state.trail.forEach((c,i)=>{if(i){const a=document.createElement('div');a.className='arrow';a.textContent='↓';el.appendChild(a)}const n=document.createElement('div');n.className='node '+(i===state.trail.length-1?'current':'');n.textContent=titleFor(c);el.appendChild(n)})}
+async function loadThread(id){$('reader').classList.add('loading');$('bridge').style.display='none';try{const visited=state.visited.join(',');const r=await fetch(`/api/thread?id=${encodeURIComponent(id)}&visited=${encodeURIComponent(visited)}`);const data=await r.json();if(!r.ok)throw new Error(data.error||'Erro ao carregar o fio');if(!state.trail.length){state.trail=[data.current];state.visited=[data.current.id]}renderCard(data.current);renderOptions(data.options||[])}catch(e){setError(e.message)}finally{$('reader').classList.remove('loading')}}
+function renderOptions(options){const el=$('options');el.innerHTML='';if(!options.length){el.innerHTML='<div class="empty">Este fio chegou a um ponto sem continuidade forte suficiente. Escolha outro cartão de partida para abrir um novo percurso.</div>';return}options.forEach(o=>{const b=document.createElement('button');b.className='option';b.innerHTML=`<div class="kind">${o.kind}</div><div class="label">${o.label}</div><div class="dest">→ ${titleFor(o.card)}</div>`;b.onclick=()=>choose(o);el.appendChild(b)})}
+async function choose(o){$('bridgeText').textContent=o.bridge;$('bridge').style.display='block';await new Promise(r=>setTimeout(r,340));state.visited.push(o.card.id);state.trail.push(o.card);window.scrollTo({top:0,behavior:'smooth'});await loadThread(o.card.id)}
+(async()=>{try{const q=new URLSearchParams(location.search);const start=q.get('start')||'ANKI-0009';await loadThread(start)}catch(e){setError(e.message)}})();
+</script>
+</body>
+</html>
