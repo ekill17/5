@@ -5,6 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Reader tools v2.1 — forced production redeploy 2026-08-22
 jobs:
   deploy:
     runs-on: ubuntu-latest
