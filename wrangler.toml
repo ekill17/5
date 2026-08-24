@@ -1,5 +1,5 @@
 name = "puxe-o-fio"
-main = "src/worker-v22.js"
+main = "src/worker-v23.js"
 compatibility_date = "2026-08-20"
 
 [assets]
