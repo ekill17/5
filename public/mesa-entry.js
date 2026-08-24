@@ -1,0 +1,1 @@
+(()=>{const actions=document.querySelector('.actions');if(!actions||document.getElementById('mesaEntry'))return;const a=document.createElement('a');a.id='mesaEntry';a.href='/mesa.html';a.className='btn';a.textContent='⚖️ Mesa Eleitoral';a.style.textDecoration='none';a.style.display='inline-flex';a.style.alignItems='center';actions.appendChild(a)})();
