@@ -1,6 +1,7 @@
 import puxe from './worker-v22.js';
 import {handleMesa} from './mesa.js';
 import {handleMesaHistory} from './mesa-history.js';
+import {handleUnifiedSearch} from './search-v24.js';
 
 async function enrichHtml(response,url){
   const type=response.headers.get('content-type')||'';
@@ -15,6 +16,8 @@ async function enrichHtml(response,url){
 export default {
   async fetch(request, env) {
     const url=new URL(request.url);
+    const unifiedResponse=await handleUnifiedSearch(request,env);
+    if(unifiedResponse)return unifiedResponse;
     const historyResponse=await handleMesaHistory(request,env);
     if(historyResponse)return historyResponse;
     if(url.pathname.startsWith('/api/mesa/')){
